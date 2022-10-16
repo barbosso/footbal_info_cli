@@ -13,12 +13,14 @@ headers = {
 
 def get_table():
     table = PrettyTable()
-    table.field_names = ["Поз", "Команда", "И", "В", "Н", "П", "З", "Пр", "+/-", "O"]
+    table.field_names = ["Поз", "Команда", "И",
+                         "В", "Н", "П", "З", "Пр", "+/-", "O"]
     table.align = "l"
     table.set_style(DOUBLE_BORDER)
     r = requests.get("https://soccer365.ru/competitions/13/", headers=headers)
     soup = BeautifulSoup(r.text, "lxml")
-    commands = soup.find("div", id="competition_table").find("tbody").findAll("tr")
+    commands = soup.find("div", id="competition_table").find(
+        "tbody").findAll("tr")
     for command in commands:
         item = command.findAll("td")
         position = item[0].text
@@ -31,7 +33,8 @@ def get_table():
         conceded_goals = item[7].text
         difference = item[8].text
         points = item[9].text.strip()
-        table.add_row([position, club_name, games, wins, drawn, loss, goals, conceded_goals, difference, points])
+        table.add_row([position, club_name, games, wins, drawn,
+                      loss, goals, conceded_goals, difference, points])
     print(table)
 
 
@@ -43,7 +46,7 @@ def get_current_tur():
     r = requests.get("https://soccer365.ru/competitions/13/", headers=headers)
     soup = BeautifulSoup(r.text, "lxml")
     calendar_tour = soup.find("div", id="next_tur")
-    tur = calendar_tour.find("div", class_="block_header").text
+    tur = calendar_tour.find("div", class_="block_header").text.strip()
     matches = calendar_tour.findAll("div", class_="game_block")
     table.title = tur
     for match in matches:
@@ -52,9 +55,9 @@ def get_current_tur():
         team2 = match.findAll("div", class_="name")[1].text
         team1_goals = match.findAll("div", class_="gls")[0].text
         team2_goals = match.findAll("div", class_="gls")[1].text
-        table.add_row([status_match, team1, team1_goals + " : " + team2_goals, team2])
+        table.add_row([status_match, team1, team1_goals +
+                      " : " + team2_goals, team2])
     print(table)
-
 
 
 def get_next_tur():
@@ -62,9 +65,11 @@ def get_next_tur():
     table.field_names = ["Время", "Дом", "Счет", "Гости"]
     table.align = "l"
     table.set_style(DOUBLE_BORDER)
-    r = requests.get("https://soccer365.ru/competitions/13/shedule/", headers=headers)
+    r = requests.get(
+        "https://soccer365.ru/competitions/13/shedule/", headers=headers)
     soup = BeautifulSoup(r.text, "lxml")
-    calendar_tour = soup.find("div", class_="live_comptt_bd").findNext("div", class_="live_comptt_bd")
+    calendar_tour = soup.find("div", class_="live_comptt_bd").findNext(
+        "div", class_="live_comptt_bd")
     tur = calendar_tour.find("div", class_="cmp_stg_ttl").text
     matches = calendar_tour.findAll("div", class_="game_block")
     table.title = tur
@@ -74,7 +79,8 @@ def get_next_tur():
         status_match = match.find("div", class_="status").find("span").text
         team1_goals = match.findAll("div", class_="gls")[0].text
         team2_goals = match.findAll("div", class_="gls")[1].text
-        table.add_row([status_match, team1, team1_goals + " : " + team2_goals, team2])
+        table.add_row([status_match, team1, team1_goals +
+                      " : " + team2_goals, team2])
     print(table)
 
 #
@@ -82,7 +88,6 @@ def get_next_tur():
 #     r = requests.get("https://soccer365.ru/competitions/13/", headers=headers)
 #     soup = BeautifulSoup(r.text, "lxml")
 #     tableb = soup.find("div", class_="live_comptt_bd")
-
 
 
 def main():
@@ -102,6 +107,7 @@ def main():
         get_current_tur()
     elif answers.get("user_option") == "Следующий Тур":
         get_next_tur()
+
 
 if __name__ == "__main__":
     main()
